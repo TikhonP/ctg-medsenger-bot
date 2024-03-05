@@ -1,0 +1,24 @@
+@go.Package { name = "github.com/TikhonP/ctg-medsenger-bot/appconfig" }
+module appconfig
+
+import "package://pkg.pkl-lang.org/pkl-go/pkl.golang@0.5.3#/go.pkl"
+
+class Server {
+
+  /// The hostname of this application.
+  host: String
+
+  /// The port to listen on.
+  port: UInt16
+
+  /// Medsenger Agent secret key.
+  medsengerAgentKey: String
+
+}
+
+class Database {
+
+}
+
+server: Server
+db: Database

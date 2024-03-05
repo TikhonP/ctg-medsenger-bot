@@ -1,0 +1,11 @@
+amends "../app_config.pkl"
+
+server = new Server {
+  host = "localhost"
+  port = 8080
+  medsengerAgentKey = "1234"
+}
+
+db = new Database {
+
+}
