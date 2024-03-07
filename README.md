@@ -14,7 +14,7 @@ pkl-gen-go pkl/app_config.pkl --base-path github.com/TikhonP/ctg-medsenger-bot
 Run air:
 
 ```bash
-air --build.cmd "go build -o bin/main cmd/main.go" --build.bin "./bin/main"
+air
 ```
 
 ## 💼 License

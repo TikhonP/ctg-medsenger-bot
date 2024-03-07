@@ -14,10 +14,17 @@ class Server {
   /// Medsenger Agent secret key.
   medsengerAgentKey: String
 
+  /// Sets server to debug mode.
+  debug: Boolean
+
 }
 
+// Postgres database configuration.
 class Database {
-
+  user: String
+  password: String
+  dbname: String
+  host: String
 }
 
 server: Server

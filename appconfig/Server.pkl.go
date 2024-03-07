@@ -10,4 +10,7 @@ type Server struct {
 
 	// Medsenger Agent secret key.
 	MedsengerAgentKey string `pkl:"medsengerAgentKey"`
+
+	// Sets server to debug mode.
+	Debug bool `pkl:"debug"`
 }

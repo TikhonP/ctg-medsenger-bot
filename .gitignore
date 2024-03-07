@@ -23,5 +23,6 @@ go.work
 *.DS_Store
 *.swp
 .idea/
-cmd/main.go
 bin/
+tmp/
+pkl/local/
