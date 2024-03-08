@@ -19,7 +19,7 @@ class Server {
 
 }
 
-// Postgres database configuration.
+/// Postgres database configuration.
 class Database {
   user: String
   password: String
@@ -29,3 +29,4 @@ class Database {
 
 server: Server
 db: Database
+sentryDSN: String

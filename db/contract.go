@@ -8,35 +8,33 @@ import (
 )
 
 const schema = `
-	CREATE TABLE IF NOT EXISTS contracts (
+	CREATE TABLE IF NOT EXISTS public.contracts (
 	    id INTEGER PRIMARY KEY NOT NULL,
 	    is_active BOOLEAN NOT NULL,
 	    agent_token VARCHAR(254),
 	    patient_name VARCHAR(254),
-	    patient_email VARCHAR(254),
-	    patient_sex VARCHAR(20),
-	    patient_phone VARCHAR(254),
-	    timezone_offset INTEGER
+	    patient_email VARCHAR(254)
 	);
 `
 
 // Contract represents Medsenger contract.
 // Create on agent /init and persist during agent lifecycle.
 type Contract struct {
-	Id             int     `db:"id"`
-	IsActive       bool    `db:"is_active"`
-	AgentToken     *string `db:"agent_token"`
-	PatientName    *string `db:"patient_name"`
-	PatientEmail   *string `db:"patient_email"`
-	PatientSex     *string `db:"patient_sex"`
-	PatientPhone   *string `db:"patient_phone"`
-	TimezoneOffset *int    `db:"timezone_offset"`
+	Id           int     `db:"id"`
+	IsActive     bool    `db:"is_active"`
+	AgentToken   *string `db:"agent_token"`
+	PatientName  *string `db:"patient_name"`
+	PatientEmail *string `db:"patient_email"`
 }
 
-// UpsetContract creates contract on database or sets it to active if already exists.
-func UpsetContract(id int) error {
-	query := "INSERT INTO contracts (id, is_active) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET is_active = EXCLUDED.is_active;"
-	_, err := db.Exec(query, id, true)
+// Save on Contract saves structure to database.
+func (c *Contract) Save() error {
+	query := `
+		INSERT INTO contracts (id, is_active, agent_token, patient_name, patient_email)
+		VALUES ($1, $2, $3, $4, $5) ON CONFLICT (id)
+		DO UPDATE SET is_active = EXCLUDED.is_active, agent_token = EXCLUDED.agent_token, patient_name = EXCLUDED.patient_name;
+	`
+	_, err := db.Exec(query, c.Id, c.IsActive, c.AgentToken, c.PatientName, c.PatientEmail)
 	return err
 }
 

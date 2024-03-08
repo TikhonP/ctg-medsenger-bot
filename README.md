@@ -5,7 +5,15 @@
 
 The __GO/HTMX__ Medsenger bot for CTG monitors integration.
 
+## 🚀 Install
+
+1. Create DB
+2. Create configuration file on `pkl/local/app_config.pkl`
+3. RUN `./cmd/setup.sh`
+
 PKL codegen:
+
+## 📦 Development
 
 ```bash
 pkl-gen-go pkl/app_config.pkl --base-path github.com/TikhonP/ctg-medsenger-bot

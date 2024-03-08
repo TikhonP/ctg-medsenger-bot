@@ -11,6 +11,8 @@ type Appconfig struct {
 	Server *Server `pkl:"server"`
 
 	Db *Database `pkl:"db"`
+
+	SentryDSN string `pkl:"sentryDSN"`
 }
 
 // LoadFromPath loads the pkl module at the given path and evaluates it into a Appconfig
