@@ -12,22 +12,24 @@ import (
 )
 
 type handlers struct {
-	root     *handler.RootHandler
-	init     *handler.InitHandler
-	status   *handler.StatusHandler
-	remove   *handler.RemoveHandler
-	settings *handler.SettingsHandler
+	root            *handler.RootHandler
+	init            *handler.InitHandler
+	status          *handler.StatusHandler
+	remove          *handler.RemoveHandler
+	settings        *handler.SettingsHandler
+	ctgNotification *handler.CtgNotificationHandler
 }
 
-func createHandlers(MAIClient *maigo.Client) *handlers {
+func createHandlers(maigoClient *maigo.Client) *handlers {
 	return &handlers{
-		init: &handler.InitHandler{MAIClient: MAIClient},
+		init: &handler.InitHandler{MaigoClient: maigoClient},
 	}
 }
 
 func Serve(cfg *appconfig.Server) {
-	MAIClient := maigo.Init(cfg.MedsengerAgentKey)
-	handlers := createHandlers(MAIClient)
+	maigoClient := maigo.Init(cfg.MedsengerAgentKey)
+	//ctgClient := NewCtgClient(cfg.Ctg.Host, &CtgCredentials{Id: cfg.Ctg.Id, Key: cfg.Ctg.Key})
+	handlers := createHandlers(maigoClient)
 
 	app := echo.New()
 	app.Debug = cfg.Debug
@@ -48,6 +50,7 @@ func Serve(cfg *appconfig.Server) {
 	app.POST("/status", handlers.status.Handle, util.ApiKeyJSON(cfg))
 	app.POST("/remove", handlers.remove.Handle, util.ApiKeyJSON(cfg))
 	app.GET("/settings", handlers.settings.Handle, util.ApiKeyGetParam(cfg))
+	app.POST("/ctg/notification", handlers.ctgNotification.Handle)
 
 	addr := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
 	err := app.Start(addr)

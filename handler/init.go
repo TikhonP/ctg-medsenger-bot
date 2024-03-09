@@ -20,7 +20,7 @@ type initModel struct {
 }
 
 type InitHandler struct {
-	MAIClient *maigo.Client
+	MaigoClient *maigo.Client
 }
 
 func (h *InitHandler) Handle(c echo.Context) error {
@@ -41,7 +41,7 @@ func (h *InitHandler) Handle(c echo.Context) error {
 		return err
 	}
 	go func(c db.Contract) {
-		ci, err := h.MAIClient.GetContractInfo(m.ContractId)
+		ci, err := h.MaigoClient.GetContractInfo(m.ContractId)
 		if err != nil {
 			log.Println(err)
 			return

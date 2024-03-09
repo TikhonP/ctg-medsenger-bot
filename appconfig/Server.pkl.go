@@ -13,4 +13,6 @@ type Server struct {
 
 	// Sets server to debug mode.
 	Debug bool `pkl:"debug"`
+
+	Ctg *Ctg `pkl:"ctg"`
 }
