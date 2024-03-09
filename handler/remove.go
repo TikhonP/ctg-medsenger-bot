@@ -6,6 +6,10 @@ import (
 	"net/http"
 )
 
+type contractIdModel struct {
+	ContractId int `json:"contract_id" validate:"required"`
+}
+
 type RemoveHandler struct {
 }
 
@@ -20,5 +24,5 @@ func (h *RemoveHandler) Handle(c echo.Context) error {
 	if err := db.MarkInactiveContractWithId(m.ContractId); err != nil {
 		return err
 	}
-	return c.NoContent(http.StatusNoContent)
+	return c.String(http.StatusCreated, "ok")
 }

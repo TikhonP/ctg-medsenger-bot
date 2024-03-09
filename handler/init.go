@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-type contractIdModel struct {
+type initModel struct {
 	ContractId        int    `json:"contract_id" validate:"required"`
 	ClinicId          int    `json:"clinic_id" validate:"required"`
 	AgentToken        string `json:"agent_token" validate:"required"`
@@ -24,7 +24,7 @@ type InitHandler struct {
 }
 
 func (h *InitHandler) Handle(c echo.Context) error {
-	m := new(contractIdModel)
+	m := new(initModel)
 	if err := c.Bind(m); err != nil {
 		return err
 	}
@@ -53,5 +53,5 @@ func (h *InitHandler) Handle(c echo.Context) error {
 			return
 		}
 	}(*contract)
-	return c.NoContent(http.StatusCreated)
+	return c.String(http.StatusCreated, "ok")
 }
