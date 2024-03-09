@@ -29,23 +29,28 @@ func Serve(cfg *appconfig.Server) {
 	MAIClient := maigo.Init(cfg.MedsengerAgentKey)
 	handlers := createHandlers(MAIClient)
 
-	e := echo.New()
-	e.Debug = cfg.Debug
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
+	app := echo.New()
+	app.Debug = cfg.Debug
+	app.Use(middleware.Logger())
+	app.Use(middleware.Recover())
+	app.Use(middleware.BodyDump(func(context echo.Context, req []byte, res []byte) {
+		fmt.Println()
+		fmt.Println("Request:", string(req))
+		fmt.Println("Response:", string(res))
+	}))
 	if !cfg.Debug {
-		e.Use(sentryecho.New(sentryecho.Options{}))
+		app.Use(sentryecho.New(sentryecho.Options{}))
 	}
-	e.Validator = util.NewDefaultValidator()
+	app.Validator = util.NewDefaultValidator()
 
-	e.GET("/", handlers.root.Handle)
-	e.POST("/init", handlers.init.Handle, util.ApiKeyJSON(cfg))
-	e.POST("/status", handlers.status.Handle, util.ApiKeyJSON(cfg))
-	e.POST("/remove", handlers.remove.Handle, util.ApiKeyJSON(cfg))
-	e.GET("/settings", handlers.settings.Handle, util.ApiKeyGetParam(cfg))
+	app.GET("/", handlers.root.Handle)
+	app.POST("/init", handlers.init.Handle, util.ApiKeyJSON(cfg))
+	app.POST("/status", handlers.status.Handle, util.ApiKeyJSON(cfg))
+	app.POST("/remove", handlers.remove.Handle, util.ApiKeyJSON(cfg))
+	app.GET("/settings", handlers.settings.Handle, util.ApiKeyGetParam(cfg))
 
 	addr := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
-	err := e.Start(addr)
+	err := app.Start(addr)
 	if err != nil {
 		panic(err)
 	}
