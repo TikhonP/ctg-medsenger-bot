@@ -13,8 +13,13 @@ const schema = `
 	    is_active BOOLEAN NOT NULL,
 	    agent_token VARCHAR(254),
 	    patient_name VARCHAR(254),
-	    patient_email VARCHAR(254)
+	    patient_email VARCHAR(254),
+	    locale VARCHAR(5)
 	);
+
+	-- Migration 1:
+	ALTER TABLE public.contracts
+	ADD COLUMN IF NOT EXISTS locale VARCHAR(5) NULL;
 `
 
 // Contract represents Medsenger contract.
@@ -25,16 +30,17 @@ type Contract struct {
 	AgentToken   *string `db:"agent_token"`
 	PatientName  *string `db:"patient_name"`
 	PatientEmail *string `db:"patient_email"`
+	Locale       *string `db:"locale"`
 }
 
 // Save on Contract saves structure to database.
 func (c *Contract) Save() error {
 	query := `
-		INSERT INTO contracts (id, is_active, agent_token, patient_name, patient_email)
-		VALUES ($1, $2, $3, $4, $5) ON CONFLICT (id)
-		DO UPDATE SET is_active = EXCLUDED.is_active, agent_token = EXCLUDED.agent_token, patient_name = EXCLUDED.patient_name;
+		INSERT INTO contracts (id, is_active, agent_token, patient_name, patient_email, locale)
+		VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (id)
+		DO UPDATE SET is_active = EXCLUDED.is_active, agent_token = EXCLUDED.agent_token, patient_name = EXCLUDED.patient_name, patient_email = EXCLUDED.patient_email, locale = EXCLUDED.locale
 	`
-	_, err := db.Exec(query, c.Id, c.IsActive, c.AgentToken, c.PatientName, c.PatientEmail)
+	_, err := db.Exec(query, c.Id, c.IsActive, c.AgentToken, c.PatientName, c.PatientEmail, c.Locale)
 	return err
 }
 

@@ -4,11 +4,19 @@ import (
 	"github.com/TikhonP/ctg-medsenger-bot/db"
 	"github.com/TikhonP/maigo"
 	"github.com/labstack/echo/v4"
+	"log"
 	"net/http"
 )
 
 type contractIdModel struct {
-	ContractId int `json:"contract_id" validate:"required"`
+	ContractId        int    `json:"contract_id" validate:"required"`
+	ClinicId          int    `json:"clinic_id" validate:"required"`
+	AgentToken        string `json:"agent_token" validate:"required"`
+	PatientAgentToken string `json:"patient_agent_token" validate:"required"`
+	DoctorAgentToken  string `json:"doctor_agent_token" validate:"required"`
+	AgentId           int    `json:"agent_id" validate:"required"`
+	AgentName         string `json:"agent_name" validate:"required"`
+	Locale            string `json:"locale" validate:"required"`
 }
 
 type InitHandler struct {
@@ -23,23 +31,27 @@ func (h *InitHandler) Handle(c echo.Context) error {
 	if err := c.Validate(m); err != nil {
 		return err
 	}
-	ci, err := h.MAIClient.GetContractInfo(m.ContractId)
-	if err != nil {
-		return err
-	}
-	agentToken, err := h.MAIClient.GetAgentTokenForContractId(m.ContractId)
-	if err != nil {
-		return err
-	}
 	contract := &db.Contract{
-		Id:           ci.Id,
-		IsActive:     true,
-		AgentToken:   &agentToken.Token,
-		PatientName:  &ci.PatientName,
-		PatientEmail: &ci.PatientEmail,
+		Id:         m.ContractId,
+		IsActive:   true,
+		AgentToken: &m.AgentToken,
+		Locale:     &m.Locale,
 	}
 	if err := contract.Save(); err != nil {
 		return err
 	}
+	go func(c db.Contract) {
+		ci, err := h.MAIClient.GetContractInfo(m.ContractId)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		contract.PatientName = &ci.PatientName
+		contract.PatientEmail = &ci.PatientEmail
+		if err := contract.Save(); err != nil {
+			log.Println(err)
+			return
+		}
+	}(*contract)
 	return c.NoContent(http.StatusCreated)
 }
