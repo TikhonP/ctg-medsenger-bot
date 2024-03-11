@@ -50,7 +50,7 @@ func Serve(cfg *appconfig.Server) {
 	app.POST("/status", handlers.status.Handle, util.ApiKeyJSON(cfg))
 	app.POST("/remove", handlers.remove.Handle, util.ApiKeyJSON(cfg))
 	app.GET("/settings", handlers.settings.Handle, util.ApiKeyGetParam(cfg))
-	app.POST("/monitor/notification", handlers.ctgNotification.Handle)
+	app.POST("/monitor/notification/new", handlers.ctgNotification.Handle)
 
 	addr := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
 	err := app.Start(addr)

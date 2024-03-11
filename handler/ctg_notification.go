@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"log"
 	"net/http"
 )
 
@@ -23,5 +24,6 @@ func (h *CtgNotificationHandler) Handle(c echo.Context) error {
 	if err := c.Validate(m); err != nil {
 		return err
 	}
+	log.Println("Got new notification: ", m)
 	return c.NoContent(http.StatusOK)
 }
