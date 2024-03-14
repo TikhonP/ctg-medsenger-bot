@@ -1,8 +1,0 @@
-root = "."
-make = "tmp"
-build_cmd = "go build -o ./tmp/main cmd/main.go"
-run_cmd = "./tmp/main"
-
-[misc]
-# Delete tmp directory on exit
-clean_on_exit = true

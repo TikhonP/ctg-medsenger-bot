@@ -1,9 +1,10 @@
+<!--suppress HtmlDeprecatedAttribute -->
 <div align="center">
     <br>
     <h1>👶 Medsenger CTG monitor bot</h1>
 </div>
 
-The __GO/HTMX__ Medsenger bot for CTG monitors integration.
+The __GO__ Medsenger bot for CTG monitors integration.
 
 ## 🚀 Install
 

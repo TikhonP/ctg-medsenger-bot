@@ -1,7 +1,7 @@
 @go.Package { name = "github.com/TikhonP/ctg-medsenger-bot/appconfig" }
 module appconfig
 
-import "package://pkg.pkl-lang.org/pkl-go/pkl.golang@0.5.3#/go.pkl"
+import "package://pkg.pkl-lang.org/pkl-go/pkl.golang@0.6.0#/go.pkl"
 
 class Ctg {
   host: String

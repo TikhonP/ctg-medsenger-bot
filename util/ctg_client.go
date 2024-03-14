@@ -1,4 +1,4 @@
-package ctg_medsenger_bot
+package util
 
 import (
 	"bytes"
@@ -60,7 +60,7 @@ func NewCtgClient(host string, credentials *CtgCredentials) *CtgClient {
 }
 
 func (c *CtgClient) urlAppendingPath(path string) *url.URL {
-	return &url.URL{Scheme: "https", Host: c.host, Path: path}
+	return &url.URL{Scheme: "http", Host: c.host, Path: path}
 }
 
 func (c *CtgClient) fetchToken() (*string, error) {
@@ -73,8 +73,8 @@ func (c *CtgClient) fetchToken() (*string, error) {
 	if err != nil {
 		return nil, err
 	}
-	if httpResponse.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("GetToken: response status code is not OK: %s", httpResponse.Status)
+	if err := checkStatusCode(httpResponse); err != nil {
+		return nil, err
 	}
 	defer httpResponse.Body.Close()
 	var response tokenResponse
@@ -116,8 +116,8 @@ func (c *CtgClient) releaseToken() error {
 	if err != nil {
 		return err
 	}
-	if httpResponse.StatusCode != http.StatusOK {
-		return fmt.Errorf("ReleaseToken: response status code is not OK: %s", httpResponse.Status)
+	if err := checkStatusCode(httpResponse); err != nil {
+		return err
 	}
 	defer httpResponse.Body.Close()
 	var response releaseTokenResponse
@@ -131,26 +131,14 @@ func (c *CtgClient) releaseToken() error {
 }
 
 func (c *CtgClient) GetRecordsList(from time.Time, to time.Time) ([]CtgRecord, error) {
-	token, err := c.getToken()
-	if err != nil {
-		return nil, err
-	}
 	reqUrl := c.urlAppendingPath("/api/list")
 	q := reqUrl.Query()
 	q.Set("begin", from.Format(time.RFC3339))
 	q.Set("end", to.Format(time.RFC3339))
 	reqUrl.RawQuery = q.Encode()
-	req, err := http.NewRequest(http.MethodGet, reqUrl.String(), nil)
+	httpResponse, err := c.makeRequest(http.MethodGet, reqUrl.String(), nil)
 	if err != nil {
 		return nil, err
-	}
-	req.Header.Set("x-access-token", *token)
-	httpResponse, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	if httpResponse.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("GetRecordsList: response status code is not OK: %s", httpResponse.Status)
 	}
 	defer httpResponse.Body.Close()
 	var response recordsResponse
@@ -163,24 +151,41 @@ func (c *CtgClient) GetRecordsList(from time.Time, to time.Time) ([]CtgRecord, e
 	return response.Result, nil
 }
 
-func (c *CtgClient) GetRecordPDF(id uuid.UUID) ([]byte, error) {
-	token, err := c.getToken()
-	if err != nil {
-		return nil, err
-	}
+func (c *CtgClient) GetRecordPDF(id uuid.UUID) (data io.ReadCloser, err error) {
 	reqUrl := c.urlAppendingPath("/api/pdf")
 	q := reqUrl.Query()
 	q.Set("uuid", id.String())
 	reqUrl.RawQuery = q.Encode()
-	req, err := http.NewRequest(http.MethodGet, reqUrl.String(), nil)
+	httpResponse, err := c.makeRequest(http.MethodGet, reqUrl.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return httpResponse.Body, nil
+}
+
+func (c *CtgClient) makeRequest(method, url string, body io.Reader) (*http.Response, error) {
+	token, err := c.getToken()
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		return nil, err
 	}
 	req.Header.Set("x-access-token", *token)
-	httpResponse, err := http.DefaultClient.Do(req)
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
-	defer httpResponse.Body.Close()
-	return io.ReadAll(httpResponse.Body)
+	if err := checkStatusCode(resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+func checkStatusCode(httpResponse *http.Response) error {
+	if !(httpResponse.StatusCode >= 200 && httpResponse.StatusCode < 300) {
+		return fmt.Errorf("GetRecordsList: response status code is not OK: %s", httpResponse.Status)
+	}
+	return nil
 }

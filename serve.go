@@ -20,16 +20,20 @@ type handlers struct {
 	ctgNotification *handler.CtgNotificationHandler
 }
 
-func createHandlers(maigoClient *maigo.Client) *handlers {
+func createHandlers(maigoClient *maigo.Client, ctgClient *util.CtgClient) *handlers {
 	return &handlers{
 		init: &handler.InitHandler{MaigoClient: maigoClient},
+		ctgNotification: &handler.CtgNotificationHandler{
+			MaigoClient: maigoClient,
+			CtgClient:   ctgClient,
+		},
 	}
 }
 
 func Serve(cfg *appconfig.Server) {
 	maigoClient := maigo.Init(cfg.MedsengerAgentKey)
-	//ctgClient := NewCtgClient(cfg.Ctg.Host, &CtgCredentials{Id: cfg.Ctg.Id, Key: cfg.Ctg.Key})
-	handlers := createHandlers(maigoClient)
+	ctgClient := util.NewCtgClient(cfg.Ctg.Host, &util.CtgCredentials{Id: cfg.Ctg.Id, Key: cfg.Ctg.Key})
+	handlers := createHandlers(maigoClient, ctgClient)
 
 	app := echo.New()
 	app.Debug = cfg.Debug

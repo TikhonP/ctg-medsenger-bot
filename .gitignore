@@ -26,3 +26,4 @@ go.work
 bin/
 tmp/
 pkl/local/
+cmd/test_ctg.go
