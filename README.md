@@ -26,6 +26,16 @@ Run air:
 air
 ```
 
+[tailwindcss](https://tailwindcss.com/blog/standalone-cli):
+
+```bash
+# Start a watcher
+tailwindcss -i view/css/input.css -o public/styles.css --watch
+
+# Compile and minify your CSS for production
+tailwindcss -i view/css/input.css -o public/styles.css --minify
+```
+
 ## 💼 License
 
 Created by Tikhon Petrishchev

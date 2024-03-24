@@ -18,6 +18,7 @@ type handlers struct {
 	remove          *handler.RemoveHandler
 	settings        *handler.SettingsHandler
 	ctgNotification *handler.CtgNotificationHandler
+	connectDevice   *handler.ConnectDeviceHandler
 }
 
 func createHandlers(maigoClient *maigo.Client, ctgClient *util.CtgClient) *handlers {
@@ -37,24 +38,30 @@ func Serve(cfg *appconfig.Server) {
 
 	app := echo.New()
 	app.Debug = cfg.Debug
-	app.Use(middleware.Logger())
-	app.Use(middleware.Recover())
-	app.Use(middleware.BodyDump(func(context echo.Context, req []byte, res []byte) {
-		fmt.Println()
-		fmt.Println("Request:", string(req))
-		fmt.Println("Response:", string(res))
+	app.HideBanner = true
+	app.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Format: "[${time_rfc3339}] ${status} ${method} ${path} (${remote_ip}) ${latency_human}\n",
+		Output: app.Logger.Output(),
 	}))
+	app.Use(middleware.Recover())
+	//app.Use(middleware.BodyDump(func(context echo.Context, req []byte, res []byte) {
+	//	fmt.Println()
+	//	fmt.Println("Request:", string(req))
+	//	fmt.Println("Response:", string(res))
+	//}))
 	if !cfg.Debug {
 		app.Use(sentryecho.New(sentryecho.Options{}))
 	}
 	app.Validator = util.NewDefaultValidator()
 
+	app.File("/styles.css", "public/styles.css")
 	app.GET("/", handlers.root.Handle)
 	app.POST("/init", handlers.init.Handle, util.ApiKeyJSON(cfg))
 	app.POST("/status", handlers.status.Handle, util.ApiKeyJSON(cfg))
 	app.POST("/remove", handlers.remove.Handle, util.ApiKeyJSON(cfg))
 	app.GET("/settings", handlers.settings.Handle, util.ApiKeyGetParam(cfg))
 	app.POST("/monitor/notification/new", handlers.ctgNotification.Handle)
+	app.GET("/connect_device_info/", handlers.connectDevice.Handle)
 
 	addr := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
 	err := app.Start(addr)
