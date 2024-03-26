@@ -4,6 +4,7 @@ go 1.22.1
 
 require (
 	github.com/TikhonP/maigo v0.1.0
+	github.com/a-h/templ v0.2.598
 	github.com/apple/pkl-go v0.6.0
 	github.com/getsentry/sentry-go v0.27.0
 	github.com/go-playground/validator/v10 v10.19.0
@@ -14,7 +15,6 @@ require (
 )
 
 require (
-	github.com/a-h/templ v0.2.598 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect

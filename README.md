@@ -14,7 +14,7 @@ The __GO__ Medsenger bot for CTG monitors integration.
 
 PKL codegen:
 
-## 📦 Development
+# 📦 Development
 
 ```bash
 pkl-gen-go pkl/app_config.pkl --base-path github.com/TikhonP/ctg-medsenger-bot
