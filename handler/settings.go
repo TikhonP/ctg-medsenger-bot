@@ -1,10 +1,11 @@
 package handler
 
 import (
+	"net/http"
+
 	"github.com/TikhonP/ctg-medsenger-bot/db"
 	"github.com/TikhonP/ctg-medsenger-bot/util"
 	"github.com/labstack/echo/v4"
-	"net/http"
 )
 
 type SettingsHandler struct {

@@ -28,3 +28,4 @@ tmp/
 pkl/local/
 cmd/test_ctg.go
 node_modules/
+*_templ.txt
